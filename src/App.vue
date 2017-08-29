@@ -29,7 +29,7 @@
     },
     components: {
       MyBottom,
-      MyHeader  
+      MyHeader
     },
     watch: {
       // 检测那个路由过来，分别给出不同的动画
