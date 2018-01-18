@@ -7,7 +7,7 @@
 >  [项目dom地址](https://ai406136.github.io/vueCom.github.io/#/all) 
 > 可在移动端打开或者Chrome 模拟手机打开
 ## *布局采用弹性盒子+rem适配,小图标用的是阿里的矢量图库*
-> 由于github 限制了只能使用https，因为阿里的小图标是http的请求，在这先不处理，想看想过的同学可以 clone下代预览，欢迎指出问题，互相学习  ^_^
+> 由于github 限制了只能使用https，但阿里的小图标是http的请求，在这先不处理，想看想过的同学可以 clone下代预览，欢迎指出问题，互相学习  ^_^
 ## Build Setup
 
 ``` bash
