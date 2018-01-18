@@ -25,96 +25,93 @@ import axios from 'axios'
 import Scroll from '../../base/scroll/scroll'
 import Loading from '../../base/loading/loading'
 import Min from '../min/min'
-import { mapGetters, mapMutations } from 'vuex'
+import { mapGetters, mapMutations, mapActions } from 'vuex'
 import { dateConversion } from '../../assets/js/js'
 export default {
-  data() {
+  data () {
     return {
       allData: [],
       scrollY: 0,
-      page: 1,
+      formData: {
+        limit: 20,
+        page: 1,
+        tab: this.Wexall || 'all'
+      },
       foo: '加载更多...',
       Xiang: 'Xiang'
     }
   },
-  created() {
+  created () {
     setTimeout(() => {
-      this._getAll(20, 1, this.Wexall)
+      this._getAll()
     }, 20)
   },
-  mounted() {
+  mounted () {
   },
   methods: {
-    _getAll(limit, page, tab) {
-      axios.get('https://www.vue-js.com/api/v1/topics', {
-        params: {
-          limit: limit,
-          page: page,
-          tab: tab
-        }
-      }).then((response) => {
-        let resData = response.data.data
-        if (resData.length === 0) {
-          this.foo = '别点啦,没有啦！'
-          return
-        }
-        if (resData.length <= 19) {
-          this.foo = '没有啦，快去发帖吧!'
-        } else {
+    _getAll () {
+      this.getList(this.formData).then(res => {
+        let list = res.data
+        if (list.length) {
+          list.forEach(v => {
+            v.create_at = v.create_at.substring(0, v.create_at.lastIndexOf('T'))
+            this.allData.push(v)
+          })
           this.foo = '加载更多....'
-        }
-
-        for (var i = 0; i < resData.length; i++) {
-          // 转换接口返回的时间格式
-          resData[i].create_at = resData[i].create_at.substring(0, resData[i].create_at.lastIndexOf('T'))
-          //每次请求奖新数据加入allDate
-          this.allData.push(resData[i])
+        } else if (list.length === 0) {
+          this.foo = '别点啦,没有啦！'
         }
       })
-        .catch((error) => {
-          console.log(error);
-        });
     },
-    GenDuo() {
-      // 加载更多时传入 +1 的数字,已获取数据
-      this.page += 1
-      this._getAll(20, this.page, this.Wexall)
+    GenDuo () {
+      this.formData.page += 1
+      this._getAll()
     },
-    Details() {
+    Details () {
       // 跳转进入 详情页 通过vuex 获取了页面的ID
       this.$router.push({
         path: `/all/${this.ItemId}`
       })
     },
-    scroll(pos) {
+    scroll (pos) {
       this.scrollY = pos.y
       if (pos.y > 1) {
         this.$refs.loading.style.display = 'block'
       }
     },
-    scrollEnd(pos) {
+    scrollEnd (pos) {
       if (this.$refs.loading.style.display == 'block') {
         this.$refs.loading.style.top = '104px'
         //下拉完刷新
         setTimeout(() => {
-          this._getAll(20, 1, this.Wexall)
+          this.reset()
+          this._getAll()
         }, 500)
         this.$refs.loading.style.display = 'none'
         //将数据清空
-        this.allData = []
-        this.page = 1
       }
     },
-    ajaxDate(e) {
+    ajaxDate (e) {
       // 将点击的模块名字 保存到vuex
       this.SetWexall(e.target.attributes['data-text'].nodeValue)
+      this.reset()
+      this._getAll()
+    },
+    reset () {
+      this.formData = {
+        limit: 20,
+        page: 1,
+        tab: this.Wexall || 'all'
+      }
+      this.formData.page = 1
       this.allData = []
-      // 通过vuex保存的模块名 请求ajax 数据
-      this._getAll(20, 1, this.Wexall)
     },
     ...mapMutations({
       SetWexall: 'SET_WEXALL'
-    })
+    }),
+    ...mapActions([
+      'getList'
+    ])
   },
   computed: {
     ...mapGetters([
@@ -128,7 +125,7 @@ export default {
     Min
   },
   watch: {
-    scrollY(newY) {
+    scrollY (newY) {
       if (newY > 1) {
         this.$refs.loading.style.top = newY - 10 + 'px'
       }
