@@ -52,7 +52,6 @@ export default {
   background-color: #1F2D3D;
   display: flex;
   position: absolute;
-  z-index: 10000;
   bottom: 0;
   justify-content: space-around;
   align-items: center;
